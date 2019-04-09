@@ -1,0 +1,41 @@
+---
+title: "The World Gets Better Eacg Year"
+author: "Jennifer Li"
+date: "3/5/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(gapminder)
+library(ggthemes)
+library(gganimate)
+library(gifski)
+library(png)
+```
+
+```{r graphs for 1952, echo=FALSE, warning=FALSE, cache=TRUE}
+gapminder %>%
+
+# mutate so you don't lose rows.
+  mutate(continent = fct_collapse(continent, Asia = c("Asia", "Oceania"))) %>%
+  filter(continent %in% c("Americas", "Africa", "Asia")) %>%
+  mutate(continent = fct_relevel(continent, levels=c("Americas", "Africa", "Asia"))) %>%
+  # group_by(continent, country) %>%
+
+  ggplot(aes(x = gdpPercap, y = lifeExp, size = pop, color = country)) +
+  scale_color_manual(values = country_colors) +
+  geom_point(alpha = 0.7, show.legend = FALSE) +
+  facet_wrap(~continent) +
+  scale_x_log10(breaks = c(1000, 10000),
+                labels = c("$1,000", "$10,000")) +
+  labs(title = "The World Gets Better Each Year: {frame_time}",
+       caption = "Source: gapminder package") +
+  xlab("GDP Per Capita") +
+  ylab("Life Expectancy") +
+  transition_time(year) +
+  theme(title = element_text(size = 16), strip.text = element_text(size = 16), axis.title = element_text(size = 16))
+
+```
+
